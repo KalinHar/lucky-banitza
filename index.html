@@ -7,14 +7,12 @@
     <title>БАНИЦА</title>
 </head>
 <body>
-    <div id="app">{{ message }}
+    <div id="app">
         <div class="banitza">
-            <div v-for="(luck, index) in lucks"
-                 :key="index"
-                 @click="choosePiece(luck)">
-                 <p class="piece">{{ luck }}</p>
-            </div>
-            <img class="banitza-img" src="./assets/26.png" alt="">
+            <img 
+                class="banitza-img"
+                :src="`./assets/${lucks.length}.png`"
+                @click="choosePiece">
         </div>
     </div>
 </body>
@@ -24,55 +22,66 @@
     const { createApp } = Vue;
 
     const getAllUrl = 'https://parseapi.back4app.com/classes/vizitec';
-    const pickPieceUrl = (id) => `${getAllUrl}/${id}`;
+    const setLuckUrl = (id) => `${getAllUrl}/${id}`;
+    const headers = {
+        'X-Parse-Application-Id': 'bRrAggyHMoMVL9uPNl4T9XPzDFxHMRIrxTEieDEN',
+        'X-Parse-REST-API-Key': 'oyNNM1odjhrSzfCkWtVmkFTiZPgmZUelFFkE5uhX'
+    }
 
-    const allLucks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+    const allLucks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26'];
 
     createApp({
         data() {
             return {
-                message: 'Hello world!',
-                lucks: []
+                lucks: [],
+                luck: '',
+                emails: [],
+                email: {},
             }
         },
         async mounted() {
-            await this.setLucks();
+            await this.setLocalState();
         },
         methods: {
-            async choosePiece(luck) {
-                const email = prompt('Въведи e-mail');
-                const emails = await this.getAllEmails();
-                const emailIndex = emails.findIndex(obj => obj.email === email);
+            async choosePiece() {
+                email = prompt('Въведи e-mail');
+                await this.setLocalState();
+                const emailIndex = this.emails.findIndex(obj => obj.email === email);
 
-                console.log(emails);
+                console.log(this.emails);
 
                 if (emailIndex > -1) {
-                    emails[emailIndex].luck.length
+                    this.email = this.emails[emailIndex]
+                    this.emails[emailIndex].luck.length
                         ? alert('Вече си изтеглил късмет от баницата!')
-                        : console.log(luck);
+                        : this.pickLuck();
                 } else {
                     alert('Въведен е невалиден e-mail');
                 }
             },
             async pickLuck() {
-                await this.setLucks();
-                const luck = this.lucks[Math.round(Math.random() * (this.lucks.length - 1))];
-                console.log(luck);
+                await this.setLocalState();
+                this.luck = this.lucks[Math.round(Math.random() * (this.lucks.length - 1))];
+                console.log(this.luck);
+                await this.setLuckRemote();
+                await setLocalState();
             },
-            async setLucks() {
-                const emails = await this.getAllEmails();
-                const usedLucks = emails.map(email => email.luck);
+            async setLocalState() {
+                this.emails = await this.getAllEmails();
+                const usedLucks = this.emails.map(email => email.luck);
                 this.lucks = allLucks.filter(luck => !usedLucks.includes(luck));
             },
             async getAllEmails() {
-                    const emailsResponse = await fetch(getAllUrl, {
-                        headers: {
-                            'X-Parse-Application-Id': 'bRrAggyHMoMVL9uPNl4T9XPzDFxHMRIrxTEieDEN',
-                            'X-Parse-REST-API-Key': 'oyNNM1odjhrSzfCkWtVmkFTiZPgmZUelFFkE5uhX'
-                        }
-                    });
-                    const emailsResult = await emailsResponse.json();
-                    return emailsResult.results;
+                const emailsResponse = await fetch(getAllUrl, { headers });
+                const emailsResult = await emailsResponse.json();
+                return emailsResult.results;
+            },
+            async setLuckRemote() {
+                const luckResponse = await fetch(setLuckUrl(this.email.objectId), {
+                    method: 'PUT',
+                    headers,
+                    body: JSON.stringify({luck: this.luck})
+                });
             }
         }
     }).mount('#app')
