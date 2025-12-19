@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +8,15 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <title>БАНИЦА</title>
 </head>
+
 <body>
     <div id="app">
         <div class="banitza">
-            <img 
-                class="banitza-img"
-                :src="`./assets/${lucks.length}.png`"
-                @click="choosePiece">
+            <img v-if="lucks.length" class="banitza-img" :src="`./assets/${lucks.length}.png`" @click="choosePiece">
         </div>
     </div>
 </body>
+
 </html>
 
 <script>
@@ -81,7 +81,7 @@
                 const luckResponse = await fetch(setLuckUrl(this.email.objectId), {
                     method: 'PUT',
                     headers,
-                    body: JSON.stringify({luck: this.luck})
+                    body: JSON.stringify({ luck: this.luck })
                 });
             }
         }
@@ -93,20 +93,35 @@
         background: url("assets/bkg.png");
         background-size: cover;
     }
+
     #app {
         height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
     }
+
     .banitza {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
     }
+
     .banitza-img {
-        height: 80vh
+        height: 80vh;
+        animation: spin 2.5s ease-out 1;
     }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(1080deg);
+        }
+    }
+
     .piece {
         cursor: pointer;
         background-color: yellow;
