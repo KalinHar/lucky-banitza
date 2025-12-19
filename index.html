@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>БАНИЦА</title>
+</head>
+<body>
+    <div id="app">{{ message }}
+        <div class="banitza">
+            <div v-for="(luck, index) in lucks"
+                 :key="index"
+                 @click="choosePiece(luck)">
+                 <p class="piece">{{ luck }}</p>
+            </div>
+            <img class="banitza-img" src="./assets/26.png" alt="">
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    const { createApp } = Vue;
+
+    const getAllUrl = 'https://parseapi.back4app.com/classes/vizitec';
+    const pickPieceUrl = (id) => `${getAllUrl}/${id}`;
+
+    const allLucks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+
+    createApp({
+        data() {
+            return {
+                message: 'Hello world!',
+                lucks: []
+            }
+        },
+        async mounted() {
+            await this.setLucks();
+        },
+        methods: {
+            async choosePiece(luck) {
+                const email = prompt('Въведи e-mail');
+                const emails = await this.getAllEmails();
+                const emailIndex = emails.findIndex(obj => obj.email === email);
+
+                console.log(emails);
+
+                if (emailIndex > -1) {
+                    emails[emailIndex].luck.length
+                        ? alert('Вече си изтеглил късмет от баницата!')
+                        : console.log(luck);
+                } else {
+                    alert('Въведен е невалиден e-mail');
+                }
+            },
+            async pickLuck() {
+                await this.setLucks();
+                const luck = this.lucks[Math.round(Math.random() * (this.lucks.length - 1))];
+                console.log(luck);
+            },
+            async setLucks() {
+                const emails = await this.getAllEmails();
+                const usedLucks = emails.map(email => email.luck);
+                this.lucks = allLucks.filter(luck => !usedLucks.includes(luck));
+            },
+            async getAllEmails() {
+                    const emailsResponse = await fetch(getAllUrl, {
+                        headers: {
+                            'X-Parse-Application-Id': 'bRrAggyHMoMVL9uPNl4T9XPzDFxHMRIrxTEieDEN',
+                            'X-Parse-REST-API-Key': 'oyNNM1odjhrSzfCkWtVmkFTiZPgmZUelFFkE5uhX'
+                        }
+                    });
+                    const emailsResult = await emailsResponse.json();
+                    return emailsResult.results;
+            }
+        }
+    }).mount('#app')
+</script>
+
+<style>
+    .banitza {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .banitza-img {
+        height: 80vh
+    }
+    .piece {
+        cursor: pointer;
+        background-color: yellow;
+        padding: 5px
+    }
+</style>
