@@ -14,6 +14,14 @@
         <div class="banitza">
             <img v-if="lucks.length" class="banitza-img" :src="`./assets/${lucks.length}.png`" @click="choosePiece">
         </div>
+        <div v-if="wish" class="mask">
+            <div class="wish">
+                <div class="close" @click="wish=''">
+                    <span>x</span>
+                </div>
+                <h2>{{wish}}</h2>
+            </div>
+        </div>
     </div>
 </body>
 
@@ -66,6 +74,7 @@
                 luck: '',
                 emails: [],
                 email: {},
+                wish: ''
             }
         },
         async mounted() {
@@ -82,7 +91,7 @@
                 if (emailIndex > -1) {
                     this.email = this.emails[emailIndex]
                     this.emails[emailIndex].luck.length
-                        ? alert('Вече си изтеглил късмет от баницата!')
+                        ? this.wish = wishes[this.emails[emailIndex].luck]
                         : this.pickLuck();
                 } else {
                     alert('Въведен е невалиден e-mail');
@@ -91,6 +100,7 @@
             async pickLuck() {
                 await this.setLocalState();
                 this.luck = this.lucks[Math.round(Math.random() * (this.lucks.length - 1))];
+                this.wish = wishes[luck];
                 console.log(this.luck);
                 await this.setLuckRemote();
                 await setLocalState();
@@ -136,7 +146,8 @@
     }
 
     .banitza-img {
-        height: 80vh;
+        width: 100%;
+        height: auto;
         animation: spin 2.5s ease-out 1;
     }
 
@@ -146,7 +157,7 @@
         }
 
         to {
-            transform: rotate(1080deg);
+            transform: rotate(720deg);
         }
     }
 
@@ -154,5 +165,54 @@
         cursor: pointer;
         background-color: yellow;
         padding: 5px
+    }
+
+    @font-face {
+        font-family: "ClassRoomCursiveSwash";
+        src: url("assets/ClassRoomCursiveSwash.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .mask {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background-color: rgb(0, 0, 0, 0.3);
+        top: 0;
+        left: 0;
+    }
+
+    .wish {
+        width: 375px;
+        height: 225.5px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        background: url("assets/papyrus.png");
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .wish h2 {
+        padding-inline: 2rem;
+        font-family: "ClassRoomCursiveSwash", cursive;
+        font-size: xx-large;
+    }
+
+    .close {
+        position: absolute;
+        top: 1rem;
+        right: 2rem;
+        cursor:pointer;
+    }
+
+    .close span {
+        font-family: 'Courier New';
+        margin: 0.2rem
     }
 </style>
