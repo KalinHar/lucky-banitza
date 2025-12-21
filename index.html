@@ -131,8 +131,7 @@
             async pickLuck() {
                 await this.setLocalState();
                 this.luck = this.lucks[Math.round(Math.random() * (this.lucks.length - 1))];
-                this.wish = wishes[luck];
-                console.log(this.luck);
+                this.wish = wishes[this.luck];
                 await this.setLuckRemote();
                 await setLocalState();
             },
