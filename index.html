@@ -133,7 +133,7 @@
                 this.luck = this.lucks[Math.round(Math.random() * (this.lucks.length - 1))];
                 this.wish = wishes[this.luck];
                 await this.setLuckRemote();
-                await setLocalState();
+                await this.setLocalState();
             },
             async setLocalState() {
                 this.emails = await this.getAllEmails();
@@ -330,3 +330,4 @@
         text-align: center;
     }
 </style>
+
