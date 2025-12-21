@@ -13,7 +13,7 @@
     <div id="app">
         <div class="banitza">
             <audio ref="xMusic" src="assets/xmas-music.mp3" loop></audio>
-            <img v-if="loaded" class="banitza-img" :src="`./assets/${lucks.length}.png`" @click="onBanitzaClick">
+            <img class="banitza-img" :src="`./assets/${lucks.length}.png`" @click="onBanitzaClick">
         </div>
         <div v-if="wish" class="mask">
             <div class="wish">
@@ -94,7 +94,6 @@
                 wish: '',
                 emailPrefix: "",
                 inputOpen: false,
-                loaded: false,
                 congrats: false
             }
         },
@@ -137,7 +136,6 @@
             },
             async setLocalState() {
                 this.emails = await this.getAllEmails();
-                this.loaded = true;
                 const usedLucks = this.emails.map(email => email.luck);
                 this.lucks = allLucks.filter(luck => !usedLucks.includes(luck));
             },
