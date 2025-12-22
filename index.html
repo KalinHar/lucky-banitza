@@ -12,14 +12,14 @@
 <body>
     <div id="app">
         <div class="header">
-            <span>Заповядайте на баницата. Моля не бъдете лакоми, количествата са ограничени</span>
+            <span>Заповядайте на баницата! Моля, не бъдете лакоми, количествата са ограничени!</span>
         </div>
         <div class="banitza">
-            <img class="banitza-img" :src="`./assets/${lucks.length}.png`" @click="inputOpen = true">
+            <img :class="[spin ? 'banitza-anim' : '', 'banitza-img']" :src="`./assets/${lucks.length}.png`" @click="inputOpen = true">
         </div>
         <div v-if="inputOpen" class="mask">
             <div class="email-input">
-                <label>С баница се почерпи и късметче получи</label>
+                <!-- <label>С баница се почерпи и късметче получи</label> -->
                 <div>
                     <input type="text" v-model="emailPrefix" placeholder="username" />
                     <span type="button" class="email-suffix" @click="choosePiece">{{emailSuffix}}</span>
@@ -33,6 +33,13 @@
                 </div>
                 <strong v-if="!congrats">{{luck}}</strong>
             </div>
+        </div>
+        <div class="lucks">
+            <template v-for="email in emails">
+                <div v-if="email.luck.length > 0">
+                    <p>{{email.name}}: {{email.luck}}</p>
+                </div>
+            </template>
         </div>
     </div>
 </body>
@@ -87,7 +94,8 @@
                 email: {},
                 emailPrefix: "",
                 inputOpen: false,
-                congrats: false
+                congrats: false,
+                spin: false
             }
         },
         computed: {
@@ -121,6 +129,7 @@
                 }
             },
             async pickLuck() {
+                this.spin = true;
                 await this.setLocalState();
                 this.luck = this.lucks[Math.round(Math.random() * (this.lucks.length - 1))];
                 await this.setLuckRemote();
@@ -128,6 +137,7 @@
             },
             async setLocalState() {
                 this.emails = await this.getAllEmails();
+                // this.emails.forEach(email => email.luck.length ? console.log(email.objectId) : null)
                 const usedLucks = this.emails.map(email => email.luck);
                 this.lucks = allLucks.filter(luck => !usedLucks.includes(luck));
             },
@@ -146,19 +156,32 @@
             toCongrats() {
                 this.luck = '';
                 this.congrats = !this.congrats;
+                this.spin = false;
             }
         }
     }).mount('#app')
 </script>
 
 <style>
+    @font-face {
+        font-family: "ClassRoomCursiveSwash";
+        src: url("assets/ClassRoomCursiveSwash.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    @font-face {
+        font-family: "Robotto";
+        src: url("assets/Roboto-Regular.ttf") format("truetype")
+    }
+
     body {
         background: url("assets/bkg.png");
         background-size: cover;
+        font-family: "Robotto";
     }
 
     #app {
-        height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -174,8 +197,11 @@
     .banitza-img {
         width: 100%;
         height: auto;
-        animation: spin 2.5s ease-out 1;
         cursor: pointer;
+    }
+
+    .banitza-anim {
+        animation: spin 2.5s ease-out 1;
     }
 
     @keyframes spin {
@@ -192,13 +218,6 @@
         cursor: pointer;
         background-color: yellow;
         padding: 5px
-    }
-
-    @font-face {
-        font-family: "ClassRoomCursiveSwash";
-        src: url("assets/ClassRoomCursiveSwash.ttf") format("truetype");
-        font-weight: normal;
-        font-style: normal;
     }
 
     .mask {
@@ -223,6 +242,11 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .lucks {
+        width: 100%;
+        padding: 1rem;
     }
 
     strong {
@@ -305,8 +329,8 @@
     }
 
     .congrats {
-        width: 480px;
-        height: 270px;
+        width: 300px;
+        height: 350px;
         position: absolute;
         top: 15rem;
         transform: translate(-50%, -50%);
