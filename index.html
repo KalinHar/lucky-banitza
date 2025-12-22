@@ -19,6 +19,9 @@
         </div>
         <div v-if="inputOpen" class="mask">
             <div class="email-input">
+                <div class="close" @click="inputOpen = false">
+                    <span class="close-email">x</span>
+                </div>
                 <!-- <label>С баница се почерпи и късметче получи</label> -->
                 <div>
                     <input type="text" v-model="emailPrefix" placeholder="username" />
@@ -171,14 +174,14 @@
     }
 
     @font-face {
-        font-family: "Robotto";
+        font-family: "Roboto";
         src: url("assets/Roboto-Regular.ttf") format("truetype")
     }
 
     body {
         background: url("assets/bkg.png");
         background-size: cover;
-        font-family: "Robotto";
+        font-family: "Roboto";
     }
 
     #app {
@@ -340,6 +343,12 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .close-email {
+        background-color: white;
+        padding: .3rem;
+        border-radius: 3px;
     }
 </style>
 
