@@ -34,7 +34,7 @@
                 <div class="close" @click="toCongrats">
                     <span>x</span>
                 </div>
-                <strong>{{luck}}</strong>
+                <p class="strong">{{luck}}</p>
             </div>
         </div>
 
@@ -48,7 +48,7 @@
         <div class="lucks">
             <template v-for="email in emails">
                 <div v-if="email.luck.length > 0">
-                    <p>{{email.name}}: {{email.luck}}</p>
+                    <p><u>{{email.name}}</u>: {{email.luck}}</p>
                 </div>
             </template>
         </div>
@@ -275,9 +275,9 @@
         padding: 1rem;
     }
 
-    strong {
+    .strong {
         padding-inline: 2rem;
-        font-size: xx-large;
+        font-size: x-large;
     }
 
     .close {
