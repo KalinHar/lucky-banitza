@@ -111,7 +111,7 @@
         },
         computed: {
             fullEmail() {
-                return this.emailPrefix + this.emailSuffix;
+                return this.emailPrefix.toLowerCase() + this.emailSuffix;
             },
             emailSuffix() {
                 return "@vizitec.com";
@@ -186,12 +186,12 @@
 </script>
 
 <style>
-    @font-face {
+    /* @font-face {
         font-family: "ClassRoomCursiveSwash";
         src: url("assets/ClassRoomCursiveSwash.ttf") format("truetype");
         font-weight: normal;
         font-style: normal;
-    }
+    } */
 
     /* @font-face {
         font-family: "Roboto";
@@ -277,7 +277,6 @@
 
     strong {
         padding-inline: 2rem;
-        font-family: "ClassRoomCursiveSwash";
         font-size: xx-large;
     }
 
