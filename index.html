@@ -22,7 +22,6 @@
                 <div class="close" @click="inputOpen = false">
                     <span class="close-email">x</span>
                 </div>
-                <!-- <label>С баница се почерпи и късметче получи</label> -->
                 <div class="flex">
                     <input type="text" v-model="emailPrefix" placeholder="username" />
                     <span type="button" class="email-suffix" @click="choosePiece">{{emailSuffix}}</span>
@@ -60,41 +59,16 @@
 <script>
     const { createApp } = Vue;
 
-    const getAllUrl = 'https://parseapi.back4app.com/classes/vizitec';
-    const setLuckUrl = (id) => `${getAllUrl}/${id}`;
+    const company = 'vizitec';
+    const back4appUrl = 'https://parseapi.back4app.com/classes/'
+    const usersUrl = `${back4appUrl}${company}Users`;
+    const lucksUrl = `${back4appUrl}${company}Lucks`;
+    const btnTextUrl = `${back4appUrl}${company}Submit`;
+    const setLuckUrl = (id) => `${usersUrl}/${id}`;
     const headers = {
-        'X-Parse-Application-Id': 'bRrAggyHMoMVL9uPNl4T9XPzDFxHMRIrxTEieDEN',
-        'X-Parse-REST-API-Key': 'oyNNM1odjhrSzfCkWtVmkFTiZPgmZUelFFkE5uhX'
+        'X-Parse-Application-Id': 'iX8L6TXUOwc7xTyXbXUGXGbnHfdASV0nt3Kn0YAL',
+        'X-Parse-REST-API-Key': 'Qm3WSavGyV7lAiWSDyuBSRJGkM6UKY7l5Ff9CiAn'
     }
-
-    const allLucks = [
-        'Повишение със сигурност ще имаш ти, защото шефа страшно те цени.',
-        'Стягай се за почерпка отсега – през новата година ще подкараш нова кола.',
-        'На вратата, като че ли нещо тебе чака и това не са сметките за тока и водата...Май са топка пелени и бебенце ще чакаш ти.',
-        'Очакват те безброй нови имоти, купени с неочаквани наследствени банкноти.',
-        'Любов ще грее силно твоето сърце, като чисто ново циганско кюмбе.',
-        'Хм, я вземи чадъра и наопаки го обърни, че за теб от утре започва порой от пари.',
-        'Знаем, хич не ти спори учението. Затова на теб се пада приключението.',
-        'Безкрайно веселие и купон подир купон, от тебе се очаква само да даваш тон!',
-        'На тебе мързелът се пада – да мързелуваш ти приляга!',
-        'Плюй си на петите и беж, че очаква те годеж!',
-        'Най-голямата награда – здравето – на теб се пада!',
-        'Годината ще е добра, ще я отбележиш с пътуване до тайнствена страна!',
-        'Ще бъдеш със сила и смелост окрилен, повече даже и от Спайдърмен!',
-        'Стилна къща с камина пада ти се таз година! С двор, с гараж и с куче – нов, мечтан дом ще получиш!',
-        'Ех, най-добрия късмет случи – пада ти се здраве и благополучие! ',
-        'Хич да не ти пука – догодина наслука!',
-        'Късметът на теб се пада, ще си облечен в дрехи на Прада!',
-        'Кариерата ще ти е приоритет, ще се изкачваш смело напред!',
-        'Няма да се отървеш от фенки, ще им трябват наколенки.',
-        'Раничката си стегни, ще караш ски във чужди планини!',
-        'Щастието ще е с теб, ще отидеш на гурбет.',
-        'От мързел няма да се отървеш, за тебе друг ще бачка щеш не щеш!',
-        'На колегите от сърце се усмихни, догодина от Хавай ще им пращаш поздрави!',
-        'Батериите здраво зареди – за тиймбилдинг на круиз се приготви!',
-        'Дори да има в обществото кризи, ще ги изкараш на петзвездни круизи!',
-        'Няма бариера пред твоята кариера. Работата ще е песен, а живота ти чудесен!'
-    ];
 
     createApp({
         data() {
@@ -106,18 +80,18 @@
                 emailPrefix: "",
                 inputOpen: false,
                 congrats: false,
-                spin: false
+                spin: false,
+                emailSuffix: '',
+                companyLucks: []
             }
         },
         computed: {
             fullEmail() {
                 return this.emailPrefix.toLowerCase() + this.emailSuffix;
-            },
-            emailSuffix() {
-                return "@vizitec.com";
-            },
+            }
         },
         async mounted() {
+            await this.getCompanyData();
             await this.setLocalState();
 
             // Clear remote lucks
@@ -132,12 +106,18 @@
             // }
         },
         methods: {
-            async choosePiece() {
-                // email = prompt('Въведи e-mail');
-                await this.setLocalState();
-                // const emailIndex = this.emails.findIndex(obj => obj.email === email);
-                const emailIndex = this.emails.findIndex(obj => obj.email === this.fullEmail);
+            async getCompanyData() {
+                const lucksResponse = await fetch(lucksUrl, { headers });
+                const lucksResult = await lucksResponse.json();
+                this.companyLucks = lucksResult.results.map(luck => luck.text);
 
+                const btnTextResponse = await fetch(btnTextUrl, { headers });
+                const btnTextResult = await btnTextResponse.json();
+                this.emailSuffix = btnTextResult.results[0].btnText;
+            },
+            async choosePiece() {
+                await this.setLocalState();
+                const emailIndex = this.emails.findIndex(obj => obj.email === this.fullEmail);
 
                 if (emailIndex > -1) {
                     this.inputOpen = false;
@@ -160,12 +140,11 @@
             },
             async setLocalState() {
                 this.emails = await this.getAllEmails();
-                // this.emails.forEach(email => !email.luck.length ? console.log(email.email) : null)
                 const usedLucks = this.emails.map(email => email.luck);
-                this.lucks = allLucks.filter(luck => !usedLucks.includes(luck));
+                this.lucks = this.companyLucks.filter(luck => !usedLucks.includes(luck));
             },
             async getAllEmails() {
-                const emailsResponse = await fetch(getAllUrl, { headers });
+                const emailsResponse = await fetch(usersUrl, { headers });
                 const emailsResult = await emailsResponse.json();
                 return emailsResult.results;
             },
@@ -205,7 +184,7 @@
 
     body {
         background: url("assets/bkg.png");
-        background-size: cover;
+        /* background-size: cover; */
         font-family: "Nautilus";
     }
 
