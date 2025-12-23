@@ -23,20 +23,28 @@
                     <span class="close-email">x</span>
                 </div>
                 <!-- <label>С баница се почерпи и късметче получи</label> -->
-                <div>
+                <div class="flex">
                     <input type="text" v-model="emailPrefix" placeholder="username" />
                     <span type="button" class="email-suffix" @click="choosePiece">{{emailSuffix}}</span>
                 </div>
             </div>
         </div>
-        <div v-if="luck || congrats" :class="congrats ? '' : 'mask'">
-            <div :class="congrats ? 'congrats' : 'luck'">
+        <div v-if="luck" class="mask">
+            <div class="luck">
                 <div class="close" @click="toCongrats">
                     <span>x</span>
                 </div>
-                <strong v-if="!congrats">{{luck}}</strong>
+                <strong>{{luck}}</strong>
             </div>
         </div>
+
+        <div v-if="congrats" class="full">
+            <div class="close-grandpa" @click="toCongrats">
+                <span>x</span>
+            </div>
+            <img src="assets/wishes.png" class="congrats">
+        </div>
+
         <div class="lucks">
             <template v-for="email in emails">
                 <div v-if="email.luck.length > 0">
@@ -111,6 +119,17 @@
         },
         async mounted() {
             await this.setLocalState();
+
+            // Clear remote lucks
+
+            // for await (const email of this.emails) {
+            //     if (email.luck.length > 0)
+            //         fetch(`https://parseapi.back4app.com/classes/vizitec/${email.objectId}`, {
+            //             method: 'PUT',
+            //             body: JSON.stringify({ luck: '' }),
+            //             headers
+            //         });
+            // }
         },
         methods: {
             async choosePiece() {
@@ -119,7 +138,6 @@
                 // const emailIndex = this.emails.findIndex(obj => obj.email === email);
                 const emailIndex = this.emails.findIndex(obj => obj.email === this.fullEmail);
 
-                // console.log(this.emails);
 
                 if (emailIndex > -1) {
                     this.inputOpen = false;
@@ -134,13 +152,15 @@
             async pickLuck() {
                 this.spin = true;
                 await this.setLocalState();
-                this.luck = this.lucks[Math.round(Math.random() * (this.lucks.length - 1))];
-                await this.setLuckRemote();
-                await this.setLocalState();
+                await setTimeout(async () => {
+                    this.luck = this.lucks[Math.round(Math.random() * (this.lucks.length - 1))];
+                    await this.setLuckRemote();
+                    await this.setLocalState();
+                }, 2500);
             },
             async setLocalState() {
                 this.emails = await this.getAllEmails();
-                // this.emails.forEach(email => email.luck.length ? console.log(email.objectId) : null)
+                this.emails.forEach(email => !email.luck.length ? console.log(email.email) : null)
                 const usedLucks = this.emails.map(email => email.luck);
                 this.lucks = allLucks.filter(luck => !usedLucks.includes(luck));
             },
@@ -173,15 +193,20 @@
         font-style: normal;
     }
 
-    @font-face {
+    /* @font-face {
         font-family: "Roboto";
         src: url("assets/Roboto-Regular.ttf") format("truetype")
+    } */
+    
+    @font-face {
+        font-family: "Nautilus";
+        src: url("assets/Nautilus.otf");
     }
 
     body {
         background: url("assets/bkg.png");
         background-size: cover;
-        font-family: "Roboto";
+        font-family: "Nautilus";
     }
 
     #app {
@@ -224,12 +249,10 @@
     }
 
     .mask {
-        /* width: 100%;
-        height: 100%; */
         padding: 5rem;
         position: absolute;
         background-color: rgb(0, 0, 0, 0.3);
-        top: 3rem;
+        top: 12rem;
     }
 
     .luck {
@@ -265,6 +288,18 @@
         cursor: pointer;
     }
 
+    .close-grandpa {
+        position: absolute;
+        top: 1rem;
+        cursor: pointer;
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        justify-content: flex-end;
+        padding-right: 1rem;
+    }
+
+    .close-grandpa span,
     .close span {
         font-family: 'Courier New';
         margin: 0.2rem
@@ -282,7 +317,6 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        /* margin-top: 3rem; */
         font-size: 1.2rem;
         gap: 0.5rem;
         text-align: center;
@@ -290,8 +324,6 @@
 
     .email-input input {
         width: 7rem !important;
-        /* background: transparent; */
-        margin-bottom: 1rem;
         padding: 8px 10px;
         font-size: 1.2rem;
         border: 1px solid #ccc;
@@ -317,38 +349,42 @@
 
     .header {
         width: 100%;
-        /* position: absolute; */
         display: flex;
         justify-content: center;
         align-items: center;
-        /* bottom: 1rem;
-        left: 0; */
     }
 
     .header span {
         padding-inline: 2rem;
-        font-size: xx-large;
+        font-size: x-large;
         text-align: center;
     }
 
     .congrats {
-        width: 300px;
-        height: 350px;
-        position: absolute;
-        top: 15rem;
-        transform: translate(-50%, -50%);
         text-align: center;
-        background: url("assets/wishes.png");
-        background-size: cover;
         display: flex;
         justify-content: center;
         align-items: center;
+        width: 100%;
+        max-width: 500px;
     }
 
     .close-email {
         background-color: white;
         padding: .3rem;
         border-radius: 3px;
+    }
+
+    .full {
+        width: 100%;
+        position: absolute;
+        top: 10%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .flex {
+        display: flex;
     }
 </style>
 
