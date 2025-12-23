@@ -160,7 +160,7 @@
             },
             async setLocalState() {
                 this.emails = await this.getAllEmails();
-                this.emails.forEach(email => !email.luck.length ? console.log(email.email) : null)
+                // this.emails.forEach(email => !email.luck.length ? console.log(email.email) : null)
                 const usedLucks = this.emails.map(email => email.luck);
                 this.lucks = allLucks.filter(luck => !usedLucks.includes(luck));
             },
